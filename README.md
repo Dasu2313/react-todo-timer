@@ -1,1 +1,1 @@
-http://localhost:5173/todo-react/
+https://dasu23.github.io/react-todo-timer

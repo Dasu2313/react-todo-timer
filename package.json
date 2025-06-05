@@ -2,7 +2,7 @@
   "name": "todo-react",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dasu23.github.io/todo-react",
+  "homepage": "https://dasu23.github.io/react-todo-timer",
   "dependencies": {
     "@babel/core": "^7.27.1",
     "@babel/eslint-parser": "^7.27.1",
