@@ -1,24 +1,23 @@
 import { useRef, useEffect, useState } from 'react'
-import { formatDistanceToNow } from 'date-fns'
+import { compareAsc, formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
 const Task = (props) => {
   const checkboxRef = useRef(null)
   const timerIntervalRef = useRef(null)
-  const [displayTime, setDisplayTime] = useState(props.elapsedTime)
+  const [displayTime, setDisplayTime] = useState();
 
   useEffect(() => {
-    setDisplayTime(props.elapsedTime);
     if (props.isRunning) {
       timerIntervalRef.current = setInterval(() => {
         const now = Date.now();
         const startedAt = new Date(props.startTime).getTime();
         const elapsedSinceStart = Math.floor((now - startedAt) / 1000);
+
         setDisplayTime(props.elapsedTime + elapsedSinceStart);
       }, 1000);
     } else {
       clearInterval(timerIntervalRef.current);
-      setDisplayTime(props.elapsedTime);
     }
 
     return () => clearInterval(timerIntervalRef.current);
@@ -53,13 +52,15 @@ const Task = (props) => {
     props.updateTasks(newTask, props.idx)
   }
 
-  const handlePlay = () => {
+  const handlePlay = (e) => {
+    e.stopPropagation();
     if (!props.isRunning) {
        props.onTimerUpdate(props.idx, { isRunning: true, startTime: new Date() });
     }
   }
 
-  const handlePause = () => {
+  const handlePause = (e) => {
+    e.stopPropagation();
     if (props.isRunning) {
       const now = Date.now();
       const startedAt = new Date(props.startTime).getTime();
@@ -75,18 +76,10 @@ const Task = (props) => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
-
   return (
     <li className={props.status}>
       <div
         className="view"
-        onClick={(e) => {
-          e.stopPropagation()
-          if (checkboxRef.current) {
-            checkboxRef.current.checked = !checkboxRef.current.checked
-            onCheckChange(checkboxRef.current.checked)
-          }
-        }}
       >
         <input
           onClick={(e) => e.stopPropagation()}
@@ -100,24 +93,24 @@ const Task = (props) => {
         />
         <label>
           <span className="title">{props.text}</span>
-          <div className="task-details">
-            <span className="timer-display">
-              <button className="icon icon-play" onClick={handlePlay}></button>
-              <button className="icon icon-pause" onClick={handlePause}></button>
-              {(displayTime > 0 || props.isRunning) && formatTime(displayTime)}
-            </span>
-            <span className="created-at">
-              created {formatDistanceToNow(props.createdAt, { addSuffix: true, includeSeconds: true })}
-            </span>
-          </div>
+           <span class="description">
+                  <button className="icon icon-play" onClick={handlePlay}></button>
+                  <button className="icon icon-pause" onClick={handlePause}></button>
+                  {(displayTime > 0 || props.isRunning) && formatTime(displayTime)}
+                </span>
+                <span class="description">created {formatDistanceToNow(props.createdAt, { addSuffix: true, includeSeconds: true })}</span>
         </label>
-      </div>
-      <button onClick={() => props.onEdit(props.idx)} className="icon icon-edit"></button>
-      <button onClick={() => props.onDelete(props.idx)} className="icon icon-destroy"></button>
+        <button onClick={() => props.onEdit(props.idx)} className="icon icon-edit"></button>
+        <button onClick={() => props.onDelete(props.idx)} className="icon icon-destroy"></button>
 
+      </div>
       {props.status === 'editing' && (
         <form onSubmit={onFormSubmit}>
-          <input type="text" className="edit" name="taskName" required defaultValue={props.text}></input>
+          <input onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              props.onEditCancel(props.idx);
+            }
+          }} type="text" className="edit" name="taskName" required defaultValue={props.text}></input>
         </form>
       )}
     </li>

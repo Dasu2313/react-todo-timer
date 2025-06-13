@@ -73,6 +73,16 @@ function App() {
                 updateTasks={updateTasks}
                 onTimerUpdate={onTimerUpdate}
                 idx={idx}
+                onEditCancel={(key) => {
+                  setTasks((prevTasks) => prevTasks.map((val, idx) => {
+                    if (idx !== key) return val;
+
+                    return {
+                      ...val,
+                      status: 'active'
+                    };
+                  }))
+                }}
                 onEdit={(key) => {
                   setTasks((prevTasks) =>
                     prevTasks.map((val, idx) => {
@@ -93,6 +103,7 @@ function App() {
                 createdAt={val.createdAt}
                 elapsedTime={val.elapsedTime}
                 isRunning={val.isRunning}
+                startTime={val.startTime}
               />
             ))}
         </TaskList>
