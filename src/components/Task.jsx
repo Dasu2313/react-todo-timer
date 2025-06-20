@@ -23,6 +23,24 @@ const Task = (props) => {
     return () => clearInterval(timerIntervalRef.current);
   }, [props.isRunning, props.elapsedTime, props.startTime]);
 
+  useEffect(() => {
+    if (typeof displayTime === 'undefined')
+      return;
+
+    if (!props.isRunning)
+      return;
+
+    const toMinutes = props.timerMinutes !== null ? props.timerMinutes : 0;
+    const toSeconds = props.timerSeconds !== null ? props.timerSeconds : 0;
+
+    const timerElapsedTime = toMinutes * 60 + toSeconds;
+
+    if (displayTime >= timerElapsedTime) {
+      props.onTimerUpdate(props.idx, {isRunning: false, elapsedTime: 0, startTime: null});
+      setDisplayTime(0);
+    }
+
+  }, [displayTime, props.isRunning]);
 
   const onFormSubmit = (event) => {
     event.preventDefault()
@@ -96,7 +114,7 @@ const Task = (props) => {
            <span class="description">
                   <button className="icon icon-play" onClick={handlePlay}></button>
                   <button className="icon icon-pause" onClick={handlePause}></button>
-                  {(displayTime > 0 || props.isRunning) && formatTime(displayTime)}
+                  {(displayTime > 0 || props.isRunning) && (typeof displayTime !== 'undefined' ? formatTime(displayTime) : '00:00')}
                 </span>
                 <span class="description">created {formatDistanceToNow(props.createdAt, { addSuffix: true, includeSeconds: true })}</span>
         </label>

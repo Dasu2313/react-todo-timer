@@ -104,6 +104,8 @@ function App() {
                 elapsedTime={val.elapsedTime}
                 isRunning={val.isRunning}
                 startTime={val.startTime}
+                timerMinutes={val.timerMinutes}
+                timerSeconds={val.timerSeconds}
               />
             ))}
         </TaskList>
